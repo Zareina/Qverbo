@@ -38,14 +38,15 @@ class _InnsTabState extends State<InnsTab> {
         child: ListView.builder(
           itemCount: innsList.length,
           itemBuilder: (context, index) {
+            Map<String, dynamic> innsData = innsList[index]['data'];
             List<String> imageUrls =
-                List<String>.from(innsList[index]['Images']);
+                List<String>.from(innsData['Images']);
             return GestureDetector(
               child: CardWidget(
                   imageUrls: imageUrls,
-                  name: innsList[index]['Name'],
-                  location: innsList[index]['Town'],
-                  rating: innsList[index]['Rating'],),
+                  name: innsData['Name'],
+                  location: innsData['Town'],
+                  rating: innsData['Rating'],),
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context)=>BookingScreen(accomodationDetails: innsList[index])));
               },

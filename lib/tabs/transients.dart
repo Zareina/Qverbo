@@ -39,14 +39,15 @@ class _TransientTabState extends State<TransientTab> {
         child: ListView.builder(
           itemCount: transientList.length,
           itemBuilder: (context, index) {
+            Map<String, dynamic> transientsData = transientList[index]['data'];
             List<String> imageUrls =
-                List<String>.from(transientList[index]['Images']);
+                List<String>.from(transientsData['Images']);
             return GestureDetector(
               child: CardWidget(
                 imageUrls: imageUrls,
-                name: transientList[index]['Name'],
-                location: transientList[index]['Town'],
-                rating: transientList[index]['Rating'],
+                name:transientsData['Name'],
+                location: transientsData['Town'],
+                rating: transientsData['Rating'],
               ),
               onTap: () {
                 Navigator.push(

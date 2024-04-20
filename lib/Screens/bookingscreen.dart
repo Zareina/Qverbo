@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qverbo/Screens/checkinscreen.dart';
+import 'package:qverbo/services/firestore.dart';
 import 'package:qverbo/widgets/ammenities.dart';
 import 'package:qverbo/widgets/guestreview.dart';
 import 'package:qverbo/widgets/imageslider.dart';
@@ -14,20 +15,58 @@ class BookingScreen extends StatefulWidget {
 }
 
 class _BookingScreenState extends State<BookingScreen> {
+  FireStoreService fireStoreService =
+      FireStoreService(); // Initialize your Firestore service
+
+  List<Map<String, dynamic>> rooms = [];
+  List<Map<String, dynamic>> reviews = [];
+  @override
+  void initState()  {
+    super.initState();
+     queryRooms(); // Wait for queryRooms to complete
+  }
+
+  Future<void> queryRooms() async {
+    List<Map<String, dynamic>> roomsData =
+        await fireStoreService.querySubCollection(
+      widget.accomodationDetails['id'],
+      'Rooms',
+    );
+    setState(() {
+      rooms = roomsData;
+      print('Rooms: $rooms');
+    });
+  }
+
+  Future<void> queryReviews() async {
+    // Call the queryRooms method from your Firestore service
+    List<Map<String, dynamic>> reviewsData =
+        await fireStoreService.querySubCollection(
+      widget.accomodationDetails['id'],
+      'Reviews',
+    );
+    setState(() {
+      reviews = reviewsData;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<String> imageUrls =
-        List<String>.from(widget.accomodationDetails['Images'] ?? []);
+    Map<String, dynamic> transientsData = widget.accomodationDetails['data'];
+    List<String> imageUrls = List<String>.from(transientsData['Images'] ?? []);
     List<String> ammenities =
-        List<String>.from(widget.accomodationDetails['Ammenities'] ?? []);
+        List<String>.from(transientsData['Ammenities'] ?? []);
 
-    List<Map<String, dynamic>>? reviews =
-        widget.accomodationDetails['Reviews'] ?? [];
-    List<Map<String, dynamic>> roomList =
-        widget.accomodationDetails['Rooms'] ?? [];
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange,
+        title: const Text(
+          'SEE AVAILABILTY',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -47,16 +86,16 @@ class _BookingScreenState extends State<BookingScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.accomodationDetails['Name'],
-                            style: TextStyle(
+                            transientsData['Name'],
+                            style: const TextStyle(
                                 fontSize: 22, fontWeight: FontWeight.bold),
                             textAlign: TextAlign.left,
                           ),
                           Row(
                             children: [
                               Icon(Icons.pin_drop_sharp),
-                              Text(widget.accomodationDetails['Town'],
-                                  style: TextStyle(
+                              Text(transientsData['Town'],
+                                  style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.normal)),
                             ],
@@ -105,9 +144,7 @@ class _BookingScreenState extends State<BookingScreen> {
               const SizedBox(
                 height: 10,
               ),
-              reviews != null
-                  ? GuestReviewWidget(reviews: reviews)
-                  : NoReviews(),
+              reviews == [] ? NoReviews() : GuestReviewWidget(reviews: reviews),
               const SizedBox(
                 height: 10,
               ),
@@ -142,7 +179,7 @@ class _BookingScreenState extends State<BookingScreen> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => CheckinScreen(roomList: roomList)));
+                    builder: (context) => CheckinScreen(roomList: rooms, accommodationDetails: widget.accomodationDetails,)));
           },
         ),
       ),

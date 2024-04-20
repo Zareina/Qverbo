@@ -38,14 +38,15 @@ class _CottageTabState extends State<CottageTab> {
         child: ListView.builder(
           itemCount: cottageList.length,
           itemBuilder: (context, index) {
+            Map<String, dynamic> cottageData = cottageList[index]['data'];
             List<String> imageUrls =
-                List<String>.from(cottageList[index]['Images']);
+                List<String>.from(cottageData['Images']);
             return GestureDetector(
               child: CardWidget(
                   imageUrls: imageUrls,
-                  name: cottageList[index]['Name'],
-                  location: cottageList[index]['Town'],
-                  rating: cottageList[index]['Rating'],),
+                  name: cottageData['Name'],
+                  location: cottageData['Town'],
+                  rating:cottageData['Rating'],),
               onTap: () {
                 Navigator.push(
                     context,
